@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">
+          <i class="fa-solid fa-list-check"></i>
+          <h2>Todo App</h2>
+        </div>
+
+        <nav>
+          <button class="menu-btn active" id="allTasks">
+            <i class="fa-solid fa-list"></i>
+            <span>All Tasks</span>
+          </button>
+
+          <button class="menu-btn" id="pendingTasks">
+            <i class="fa-solid fa-hourglass-half"></i>
+            <span>Pending</span>
+          </button>
+
+          <button class="menu-btn" id="completedTasks">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Completed</span>
+          </button>
+        </nav>
+
+        <div class="stats">
+          <div class="stat-card">
+            <h3 id="totalCount">0</h3>
+            <p>Total</p>
+          </div>
+
+          <div class="stat-card">
+            <h3 id="pendingCount">0</h3>
+            <p>Pending</p>
+          </div>
+
+          <div class="stat-card">
+            <h3 id="completedCount">0</h3>
+            <p>Completed</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="content">
+        <header>
+          <h1>Welcome Back 👋</h1>
+
+          <p>Organize your daily tasks and stay productive.</p>
+        </header>
+
+        <!-- Input -->
+        <section class="todo-box">
+          <input type="text" id="input" placeholder="Enter your task..." />
+
+          <button id="add">
+            <i class="fa-solid fa-plus"></i>
+            Add Task
+          </button>
+        </section>
+
+        <!-- Todo List -->
+        <section class="todo-list">
+          <ol id="items"></ol>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
