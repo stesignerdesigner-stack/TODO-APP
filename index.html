@@ -4,11 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Todo Dashboard</title>
+
     <link rel="stylesheet" href="style.css" />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
@@ -63,17 +66,26 @@
       <main class="content">
         <header>
           <h1>Welcome Back 👋</h1>
-
           <p>Organize your daily tasks and stay productive.</p>
         </header>
 
-        <!-- Input -->
+        <!-- Input Section -->
         <section class="todo-box">
-          <input type="text" id="input" placeholder="Enter your task..." />
+          <input
+            type="text"
+            id="input"
+            placeholder="Enter your task..."
+            autocomplete="off"
+          />
 
           <button id="add">
             <i class="fa-solid fa-plus"></i>
             Add Task
+          </button>
+
+          <button id="deleteAll">
+            <i class="fa-solid fa-trash"></i>
+            Delete All
           </button>
         </section>
 

@@ -1,5 +1,6 @@
 const input = document.getElementById("input");
 const addBtn = document.getElementById("add");
+const deleteAllBtn = document.getElementById("deleteAll");
 const items = document.getElementById("items");
 
 const totalCount = document.getElementById("totalCount");
@@ -14,11 +15,10 @@ let todos = JSON.parse(localStorage.getItem("todos")) || [];
 let currentFilter = "all";
 
 addBtn.addEventListener("click", addTodo);
+deleteAllBtn.addEventListener("click", deleteAllTodos);
 
 input.addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    addTodo();
-  }
+  e.key === "Enter" ? addTodo() : null;
 });
 
 allBtn.addEventListener("click", function () {
@@ -52,7 +52,7 @@ function saveTodos() {
 }
 
 function addTodo() {
-  let value = input.value.trim();
+  const value = input.value.trim();
 
   if (value === "") {
     Swal.fire({
@@ -64,11 +64,23 @@ function addTodo() {
     return;
   }
 
+  const duplicate = todos.some(function (todo) {
+    return todo.text.toLowerCase() === value.toLowerCase();
+  });
+
+  if (duplicate) {
+    Swal.fire({
+      icon: "warning",
+      title: "Duplicate Task",
+      text: "This task already exists.",
+    });
+
+    return;
+  }
+
   todos.push({
     id: Date.now(),
-
     text: value,
-
     completed: false,
   });
 
@@ -82,70 +94,46 @@ function addTodo() {
 renderTodos();
 
 function renderTodos() {
-  while (items.firstChild) {
-    items.removeChild(items.firstChild);
-  }
+  items.innerHTML = "";
 
-  let filteredTodos = [];
-
-  if (currentFilter === "all") {
-    filteredTodos = todos;
-  } else if (currentFilter === "pending") {
-    filteredTodos = todos.filter(function (todo) {
-      return !todo.completed;
-    });
-  } else {
-    filteredTodos = todos.filter(function (todo) {
-      return todo.completed;
-    });
-  }
+  let filteredTodos =
+    currentFilter === "all"
+      ? todos
+      : currentFilter === "pending"
+        ? todos.filter(function (todo) {
+            return !todo.completed;
+          })
+        : todos.filter(function (todo) {
+            return todo.completed;
+          });
 
   filteredTodos.forEach(function (todo) {
-    let li = document.createElement("li");
+    const li = document.createElement("li");
 
-    let text = document.createElement("span");
+    const text = document.createElement("span");
     text.className = "todo-text";
+    text.textContent = todo.text;
 
-    let textNode = document.createTextNode(todo.text);
-
-    text.appendChild(textNode);
-
-    if (todo.completed) {
-      text.classList.add("completed");
-    }
+    todo.completed ? text.classList.add("completed") : null;
 
     li.appendChild(text);
 
-    let btnGroup = document.createElement("div");
+    const btnGroup = document.createElement("div");
     btnGroup.className = "btn-group";
 
-    let editBtn = document.createElement("button");
+    const editBtn = document.createElement("button");
     editBtn.className = "edit-btn";
+    editBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
 
-    let editIcon = document.createElement("i");
-    editIcon.className = "fa-solid fa-pen";
-
-    editBtn.appendChild(editIcon);
-
-    let deleteBtn = document.createElement("button");
+    const deleteBtn = document.createElement("button");
     deleteBtn.className = "delete-btn";
+    deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
 
-    let deleteIcon = document.createElement("i");
-    deleteIcon.className = "fa-solid fa-trash";
-
-    deleteBtn.appendChild(deleteIcon);
-
-    let completeBtn = document.createElement("button");
+    const completeBtn = document.createElement("button");
     completeBtn.className = "complete-btn";
+    completeBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
 
-    let checkIcon = document.createElement("i");
-    checkIcon.className = "fa-solid fa-check";
-
-    completeBtn.appendChild(checkIcon);
-
-    btnGroup.appendChild(editBtn);
-    btnGroup.appendChild(deleteBtn);
-    btnGroup.appendChild(completeBtn);
+    btnGroup.append(editBtn, deleteBtn, completeBtn);
 
     li.appendChild(btnGroup);
 
@@ -172,32 +160,20 @@ function updateStats() {
   let completed = 0;
 
   todos.forEach(function (todo) {
-    if (todo.completed) {
-      completed++;
-    } else {
-      pending++;
-    }
+    todo.completed ? completed++ : pending++;
   });
 
-  totalCount.firstChild
-    ? (totalCount.firstChild.nodeValue = todos.length)
-    : totalCount.appendChild(document.createTextNode(todos.length));
+  totalCount.textContent = todos.length;
+  pendingCount.textContent = pending;
+  completedCount.textContent = completed;
 
-  pendingCount.firstChild
-    ? (pendingCount.firstChild.nodeValue = pending)
-    : pendingCount.appendChild(document.createTextNode(pending));
-
-  completedCount.firstChild
-    ? (completedCount.firstChild.nodeValue = completed)
-    : completedCount.appendChild(document.createTextNode(completed));
+  deleteAllBtn.disabled = todos.length === 0 ? true : false;
 }
 
 function editTodo(todo, li, textSpan) {
-  if (li.querySelector(".todo-input")) {
-    return;
-  }
+  if (li.querySelector(".todo-input")) return;
 
-  let editInput = document.createElement("input");
+  const editInput = document.createElement("input");
   editInput.type = "text";
   editInput.className = "todo-input";
   editInput.value = todo.text;
@@ -207,30 +183,38 @@ function editTodo(todo, li, textSpan) {
   editInput.focus();
   editInput.select();
 
-  let btnGroup = li.querySelector(".btn-group");
+  const btnGroup = li.querySelector(".btn-group");
+  const editBtn = btnGroup.children[0];
 
-  let editBtn = btnGroup.children[0];
-
-  while (editBtn.firstChild) {
-    editBtn.removeChild(editBtn.firstChild);
-  }
-
-  let saveIcon = document.createElement("i");
-  saveIcon.className = "fa-solid fa-floppy-disk";
-
-  editBtn.appendChild(saveIcon);
+  editBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
 
   editBtn.classList.remove("edit-btn");
   editBtn.classList.add("save-btn");
 
   function saveTodo() {
-    let value = editInput.value.trim();
+    const value = editInput.value.trim();
 
     if (value === "") {
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Todo cannot be empty.",
+      });
+
+      return;
+    }
+
+    const duplicate = todos.some(function (item) {
+      return (
+        item.id !== todo.id && item.text.toLowerCase() === value.toLowerCase()
+      );
+    });
+
+    if (duplicate) {
+      Swal.fire({
+        icon: "warning",
+        title: "Duplicate Task",
+        text: "Another task with the same name already exists.",
       });
 
       return;
@@ -248,9 +232,7 @@ function editTodo(todo, li, textSpan) {
   });
 
   editInput.addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-      saveTodo();
-    }
+    e.key === "Enter" ? saveTodo() : null;
   });
 }
 
@@ -264,33 +246,62 @@ function deleteTodo(id) {
     cancelButtonColor: "#6b7280",
     confirmButtonText: "Delete",
   }).then(function (result) {
-    if (result.isConfirmed) {
-      todos = todos.filter(function (todo) {
-        return todo.id !== id;
-      });
-
-      saveTodos();
-
-      renderTodos();
-
-      Swal.fire({
-        icon: "success",
-        title: "Deleted!",
-        timer: 1200,
-        showConfirmButton: false,
-      });
-    }
+    result.isConfirmed
+      ? ((todos = todos.filter(function (todo) {
+          return todo.id !== id;
+        })),
+        saveTodos(),
+        renderTodos(),
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          timer: 1200,
+          showConfirmButton: false,
+        }))
+      : null;
   });
 }
 
 function completeTodo(id) {
   todos.forEach(function (todo) {
-    if (todo.id === id) {
-      todo.completed = !todo.completed;
-    }
+    todo.id === id ? (todo.completed = !todo.completed) : null;
   });
 
   saveTodos();
-  
+
   renderTodos();
+}
+
+function deleteAllTodos() {
+  if (todos.length === 0) {
+    Swal.fire({
+      icon: "info",
+      title: "No Tasks",
+      text: "There are no tasks to delete.",
+    });
+
+    return;
+  }
+
+  Swal.fire({
+    title: "Delete All Tasks?",
+    text: "All tasks will be permanently deleted.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#ef4444",
+    cancelButtonColor: "#6b7280",
+    confirmButtonText: "Delete All",
+  }).then(function (result) {
+    result.isConfirmed
+      ? ((todos = []),
+        saveTodos(),
+        renderTodos(),
+        Swal.fire({
+          icon: "success",
+          title: "All Tasks Deleted",
+          timer: 1500,
+          showConfirmButton: false,
+        }))
+      : null;
+  });
 }
